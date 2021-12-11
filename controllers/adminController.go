@@ -60,6 +60,7 @@ func GetUsers() gin.HandlerFunc {
 	}
 
 }
+
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("user_id")
@@ -78,7 +79,7 @@ func GetUser() gin.HandlerFunc {
 	}
 }
 
-func addProduct() gin.HandlerFunc {
+func AddProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
