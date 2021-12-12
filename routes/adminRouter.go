@@ -12,4 +12,5 @@ func AdminRouters(incomingRoutes *gin.Engine) {
 	incomingRoutes.GET("/users", controller.GetUsers())
 	incomingRoutes.GET("/user/:user_id", controller.GetUser())
 	incomingRoutes.POST("/add-product", controller.AddProduct())
+	incomingRoutes.GET("/products", controller.IndexProducts())
 }

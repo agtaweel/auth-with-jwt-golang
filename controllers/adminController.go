@@ -61,24 +61,6 @@ func GetUsers() gin.HandlerFunc {
 
 }
 
-func GetUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userId := c.Param("user_id")
-		if err := helpers.MatchUserTypeToUid(c, userId); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		}
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-		var user models.User
-		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
-		defer cancel()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, user)
-	}
-}
-
 func AddProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
@@ -86,6 +68,10 @@ func AddProduct() gin.HandlerFunc {
 			return
 		}
 		var product models.Product
+		if err := c.BindJSON(&product); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 		validationErr := validate.Struct(product)
@@ -108,6 +94,28 @@ func AddProduct() gin.HandlerFunc {
 		}
 		defer cancel()
 		c.JSON(http.StatusOK, insertionId)
+
+	}
+}
+
+func IndexProducts() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		var products []bson.M
+		result, err1 := productCollection.Find(ctx, bson.M{})
+		defer cancel()
+		if err1 != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err1.Error()})
+			return
+		}
+		if err := result.All(ctx, &products); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, products)
 
 	}
 }
