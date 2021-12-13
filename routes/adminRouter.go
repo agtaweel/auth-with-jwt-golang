@@ -13,4 +13,7 @@ func AdminRouters(incomingRoutes *gin.Engine) {
 	incomingRoutes.GET("/user/:user_id", controller.GetUser())
 	incomingRoutes.POST("/add-product", controller.AddProduct())
 	incomingRoutes.GET("/products", controller.IndexProducts())
+	incomingRoutes.DELETE("/product/:product_id", controller.DeleteProduct())
+	incomingRoutes.GET("/product/:product_id", controller.GetProduct())
+	incomingRoutes.PUT("/product/:product_id", controller.UpdateProduct())
 }
