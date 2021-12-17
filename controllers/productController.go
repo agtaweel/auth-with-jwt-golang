@@ -56,10 +56,6 @@ func AddProduct() gin.HandlerFunc {
 
 func IndexProducts() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		var products []bson.M
 		result, err1 := productCollection.Find(ctx, bson.M{})
@@ -100,10 +96,6 @@ func DeleteProduct() gin.HandlerFunc {
 
 func GetProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
 		productID := c.Param("product_id")
 		var product models.Product
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -121,6 +113,10 @@ func GetProduct() gin.HandlerFunc {
 
 func UpdateProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		productID := c.Param("product_id")
 		var product models.Product
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
